@@ -1,0 +1,111 @@
+bind:
+  build: .
+  ports:
+    - "53"
+    - "953"
+    - "53/udp"
+    - "953/udp"
+
+  command: named -g
+
+dbdata:
+  image: mysql:5.5
+  volumes:
+    - /var/lib/mysql
+  command: /bin/true
+
+mysql:
+  build: dev/mysql
+
+  volumes_from:
+    - dbdata
+
+  volumes:
+    - mysql/bind_host.cnf:/etc/mysql/conf.d/bind_host.cnf
+    - mysql/setup_database.sql:/docker-entrypoint-initdb.d/setup_databases.sql
+
+  environment:
+    MYSQL_ROOT_PASSWORD: password
+
+  ports:
+    - "3306"
+
+rabbit:
+  image: rabbitmq
+
+  environment:
+    RABBITMQ_DEFAULT_USER: designate
+    RABBITMQ_DEFAULT_PASS: designate
+
+  ports:
+    - "5672"
+
+memcached:
+  image: memcached
+  ports:
+    - "11211:11211"
+
+zookeeper:
+  image: mesoscloud/zookeeper:3.4.6-ubuntu-14.04
+  ports:
+    - "2181:2181"
+
+api:
+  build: .
+  links:
+    - rabbit
+
+  ports:
+    - "9001:9001"
+
+  volumes:
+    - .:/code
+    - etc/designate:/etc/designate
+
+  command: designate-api
+
+central:
+  build: .
+  links:
+    - rabbit
+    - mysql
+  volumes:
+    - etc/designate:/etc/designate
+
+  command: designate-central
+
+mdns:
+  build: .
+  links:
+    - rabbit
+    - mysql
+  volumes:
+    - etc/designate:/etc/designate
+
+  ports:
+    - "5354:5354"
+
+  command: designate-central
+
+
+poolmanager:
+  build: .
+  links:
+    - rabbit
+    - memcached
+    - mysql
+  volumes:
+    - etc/designate:/etc/designate
+
+  command: designate-pool-manager
+
+zonemanager:
+  build: .
+  links:
+    - rabbit
+    - memcached
+    - mysql
+  volumes:
+    - etc/designate:/etc/designate
+
+  command: designate-zone-manager
