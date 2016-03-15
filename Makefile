@@ -17,5 +17,9 @@ cluster_info:
 	$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina get $(CARINA_CLUSTER_NAME)
 
 
-build_container:
-	$(WITH_CLUSTER) && docker build -t $(CONTAINER_NAME) .
+build_containers:
+	$(WITH_CLUSTER) && docker-compose build
+
+
+start_all:
+	$(WITH_CLUSTER) && docker-compose up

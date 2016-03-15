@@ -15,7 +15,7 @@ dbdata:
   command: /bin/true
 
 mysql:
-  build: dev/mysql
+  image: mysql:5.5
 
   volumes_from:
     - dbdata
@@ -58,10 +58,6 @@ api:
   ports:
     - "9001:9001"
 
-  volumes:
-    - .:/code
-    - etc/designate:/etc/designate
-
   command: designate-api
 
 central:
@@ -69,8 +65,6 @@ central:
   links:
     - rabbit
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
 
   command: designate-central
 
@@ -79,9 +73,6 @@ mdns:
   links:
     - rabbit
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
-
   ports:
     - "5354:5354"
 
@@ -94,8 +85,6 @@ poolmanager:
     - rabbit
     - memcached
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
 
   command: designate-pool-manager
 
@@ -105,7 +94,5 @@ zonemanager:
     - rabbit
     - memcached
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
 
   command: designate-zone-manager
