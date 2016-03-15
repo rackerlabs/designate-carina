@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-COPY dev/debconf_selections debconf_selections
+COPY mysql/debconf_selections debconf_selections
 RUN debconf-set-selections -v debconf_selections
 
 RUN apt-get update && apt-get install -y \
