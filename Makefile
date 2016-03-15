@@ -2,7 +2,7 @@ VENV := .venv
 CARINA_CREDS_YML := .creds.yml
 CARINA_CLUSTER_NAME := 'designate'
 WITH_CLUSTER := eval `$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina env $(CARINA_CLUSTER_NAME)`
-
+CONTAINER_NAME := 'designate'
 
 bootstrap:
 	brew install carina
@@ -18,4 +18,4 @@ cluster_info:
 
 
 build_container:
-	$(WITH_CLUSTER) && docker build .
+	$(WITH_CLUSTER) && docker build -t $(CONTAINER_NAME) .
