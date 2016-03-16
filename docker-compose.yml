@@ -23,6 +23,8 @@ mysql:
   ports:
     - "3306"
 
+  command: /usr/bin/mysqld_safe
+
 rabbit:
   image: rabbitmq
 
@@ -49,7 +51,7 @@ api:
     - rabbit
 
   ports:
-    - "9001:9001"
+    - "9001"
 
   command: designate-api
 
@@ -67,7 +69,7 @@ mdns:
     - rabbit
     - mysql
   ports:
-    - "5354:5354"
+    - "5354"
 
   command: designate-central
 
