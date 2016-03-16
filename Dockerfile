@@ -1,6 +1,7 @@
 FROM ubuntu:14.04
 
 COPY mysql/debconf_selections debconf_selections
+
 RUN debconf-set-selections -v debconf_selections
 
 RUN apt-get update && apt-get install -y \
@@ -39,3 +40,10 @@ COPY bind/named.conf.options /etc/bind/named.conf.options
 RUN touch /etc/apparmor.d/disable/usr.sbin.named
 RUN chown -R bind:bind /var/cache/bind
 RUN chown bind:bind /etc/bind/rndc.key
+
+# Get mysql setup
+COPY mysql/bind_host.cnf /etc/mysql/conf.d/bind_host.cnf
+COPY mysql/setup_databases.sql setup_databases.sql
+
+# NOTE: A new password can be included in the setup_databases.sql
+RUN /etc/init.d/mysql start && mysql -u root --password=password < setup_databases.sql
