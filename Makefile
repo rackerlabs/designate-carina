@@ -9,17 +9,24 @@ bootstrap:
 	virtualenv $(VENV)
 	$(VENV)/bin/pip install withenv
 
-create_cluster:
+create-cluster:
 	$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina create $(CARINA_CLUSTER_NAME)
 
 
-cluster_info:
+cluster-info:
 	$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina get $(CARINA_CLUSTER_NAME)
 
 
-build_containers:
+build-containers:
 	$(WITH_CLUSTER) && docker-compose build
 
 
-start_all:
-	$(WITH_CLUSTER) && docker-compose up
+start-backend:
+	$(WITH_CLUSTER) && docker-compose start bind mysql rabbit memcached zookeeper
+
+migrate-db:
+	$(WITH_CLUSTER) && docker-compose run central designate-manage database sync
+	$(WITH_CLUSTER) && docker-compose run central designate-manage pool-manager-cache sync
+
+start-designate:
+	$(WITH_CLUSTER) && docker-compose up api central mdns poolmanager zonemanager
