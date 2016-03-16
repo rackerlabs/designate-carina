@@ -16,7 +16,6 @@ create-cluster:
 cluster-info:
 	$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina get $(CARINA_CLUSTER_NAME)
 
-
 build-containers:
 	$(WITH_CLUSTER) && docker-compose build
 
@@ -34,8 +33,10 @@ start-designate-foreground:
 start-designate:
 	$(WITH_CLUSTER) && docker-compose start api central mdns poolmanager zonemanager
 
-
 all: build-containers start-backend migrate-db start-designate
 	@echo 'Everything should be running! Take a look at this Makefile to see '
 	@echo 'how to get your credentials working in order to use docker compose '
 	@echo 'and swarm together.'
+
+ps:
+	$(WITH_CLUSTER) && docker-compose ps
