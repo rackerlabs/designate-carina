@@ -30,6 +30,11 @@ WORKDIR /code
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
+WORKDIR /
+
+# Copy over our designate config
+COPY etc/designate /etc/designate
+
 # Get rabbit sorted
 RUN /etc/init.d/rabbitmq-server start && \
     rabbitmqctl add_user designate designate && \
