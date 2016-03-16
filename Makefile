@@ -30,3 +30,6 @@ migrate-db:
 
 start-designate:
 	$(WITH_CLUSTER) && docker-compose up api central mdns poolmanager zonemanager
+
+
+all: build-containers start-backend migrate-db start-designate
