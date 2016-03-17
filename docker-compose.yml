@@ -9,26 +9,21 @@ bind:
   command: named -g
 
 dbdata:
-  image: mysql:5.5
+  build: .
   volumes:
     - /var/lib/mysql
   command: /bin/true
 
 mysql:
-  build: dev/mysql
+  build: .
 
   volumes_from:
     - dbdata
 
-  volumes:
-    - mysql/bind_host.cnf:/etc/mysql/conf.d/bind_host.cnf
-    - mysql/setup_database.sql:/docker-entrypoint-initdb.d/setup_databases.sql
-
-  environment:
-    MYSQL_ROOT_PASSWORD: password
-
   ports:
     - "3306"
+
+  command: /usr/bin/mysqld_safe
 
 rabbit:
   image: rabbitmq
@@ -56,11 +51,7 @@ api:
     - rabbit
 
   ports:
-    - "9001:9001"
-
-  volumes:
-    - .:/code
-    - etc/designate:/etc/designate
+    - "9001"
 
   command: designate-api
 
@@ -69,8 +60,6 @@ central:
   links:
     - rabbit
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
 
   command: designate-central
 
@@ -79,11 +68,8 @@ mdns:
   links:
     - rabbit
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
-
   ports:
-    - "5354:5354"
+    - "5354"
 
   command: designate-central
 
@@ -94,8 +80,6 @@ poolmanager:
     - rabbit
     - memcached
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
 
   command: designate-pool-manager
 
@@ -105,7 +89,5 @@ zonemanager:
     - rabbit
     - memcached
     - mysql
-  volumes:
-    - etc/designate:/etc/designate
 
   command: designate-zone-manager
