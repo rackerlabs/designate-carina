@@ -40,3 +40,8 @@ all: build-containers start-backend migrate-db start-designate
 
 ps:
 	$(WITH_CLUSTER) && docker-compose ps
+
+ports:
+	@echo "API: `docker-compose port api 9001`"
+	@echo "BIND (udp): `docker-compose port --protocol=udp bind 53`"
+	@echo "BIND (tcp): `docker-compose port --protocol=tcp bind 53`"
