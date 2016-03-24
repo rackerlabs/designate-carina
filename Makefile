@@ -12,8 +12,10 @@ help:
 	@echo "cluster-create     - create the carina cluster ($(CARINA_CLUSTER_NAME))"
 	@echo "cluster-info       - show the carina cluster ($(CARINA_CLUSTER_NAME))"
 	@echo "cluster-creds      - download the cluster credentials ($(CARINA_CLUSTER_NAME))"
+	@echo "docker-info        - show node info about your cluster"
 	@echo "build-containers   - build the designate containers"
 	@echo "start              - start all of the designate containers"
+	@echo "logs               - display logs from all containers"
 	@echo "start-foreground   - same as start, but in the foreground"
 	@echo "stop               - stop all of the designate containers"
 	@echo "ps                 - list the containers"
@@ -33,6 +35,9 @@ cluster-info:
 cluster-creds:
 	$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina credentials $(CARINA_CLUSTER_NAME)
 
+docker-info:
+	$(WITH_CLUSTER) && docker info
+
 build-containers:
 	$(WITH_CLUSTER) && docker-compose build
 
@@ -41,6 +46,9 @@ start-foreground:
 
 start:
 	$(WITH_CLUSTER) && docker-compose up -d
+
+logs:
+	$(WITH_CLUSTER) && docker-compose logs
 
 stop:
 	$(WITH_CLUSTER) && docker-compose down
@@ -55,5 +63,7 @@ ps:
 
 ports:
 	@$(WITH_CLUSTER) && echo "API='`docker-compose port api 9001`'"
-	@$(WITH_CLUSTER) && echo "BIND_UDP='`docker-compose port --protocol=udp bind 53`'"
-	@$(WITH_CLUSTER) && echo "BIND_TCP='`docker-compose port --protocol=tcp bind 53`'"
+	@$(WITH_CLUSTER) && echo "BIND1_UDP='`docker-compose port --protocol=udp bind-1 53`'"
+	@$(WITH_CLUSTER) && echo "BIND1_TCP='`docker-compose port --protocol=tcp bind-1 53`'"
+	@$(WITH_CLUSTER) && echo "BIND2_UDP='`docker-compose port --protocol=udp bind-2 53`'"
+	@$(WITH_CLUSTER) && echo "BIND2_TCP='`docker-compose port --protocol=tcp bind-2 53`'"
