@@ -15,6 +15,7 @@ help:
 	@echo "build-containers   - build the designate containers"
 	@echo "start              - start all of the designate containers"
 	@echo "start-foreground   - same as start, but in the foreground"
+	@echo "stop               - stop all of the designate containers"
 	@echo "ps                 - list the containers"
 	@echo "ports              - list url:port for the api and bind"
 
