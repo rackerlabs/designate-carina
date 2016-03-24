@@ -41,6 +41,9 @@ start-foreground:
 start:
 	$(WITH_CLUSTER) && docker-compose up -d
 
+stop:
+	$(WITH_CLUSTER) && docker-compose down
+
 all: cluster-creds build-containers start
 	@echo 'Everything should be running! Take a look at this Makefile to see '
 	@echo 'how to get your credentials working in order to use docker compose '
