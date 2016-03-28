@@ -3,6 +3,7 @@ SHELL := /bin/bash
 VENV := .venv
 CARINA_CREDS_YML := .creds.yml
 CARINA_CLUSTER_NAME := designate
+# use WITH_CLUSTER := true, to run containers locally rather than on carina
 WITH_CLUSTER := eval `$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina env $(CARINA_CLUSTER_NAME)`
 CONTAINER_NAME := designate
 
@@ -15,10 +16,11 @@ help:
 	@echo "docker-info        - show node info about your cluster"
 	@echo "build-containers   - build the designate containers"
 	@echo "start              - start all of the designate containers"
-	@echo "logs               - display logs from all containers"
 	@echo "start-foreground   - same as start, but in the foreground"
 	@echo "stop               - stop all of the designate containers"
+	@echo "rm                 - remove stopped containers"
 	@echo "ps                 - list the containers"
+	@echo "logs               - display logs from all containers"
 	@echo "ports              - list url:port for the api and bind"
 
 bootstrap:
@@ -52,6 +54,9 @@ logs:
 
 stop:
 	$(WITH_CLUSTER) && docker-compose down
+
+rm:
+	$(WITH_CLUSTER) && docker-compose rm
 
 all: cluster-creds build-containers start
 	@echo 'Everything should be running! Take a look at this Makefile to see '

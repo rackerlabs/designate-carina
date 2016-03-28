@@ -62,4 +62,6 @@ COPY etc/designate /etc/designate
 RUN sed "s/@mysql/@127.0.0.1/g" /etc/designate/designate.conf > /etc/designate/local-mysql.conf
 
 # NOTE: A new password can be included in the setup_databases.sql
-RUN /etc/init.d/mysql start && mysql -u root --password=password < setup_databases.sql && designate-manage --config-file /etc/designate/local-mysql.conf database sync
+RUN /etc/init.d/mysql start && \
+    mysql -u root --password=password < setup_databases.sql && \
+    designate-manage --config-file /etc/designate/local-mysql.conf database sync
