@@ -1,24 +1,39 @@
-bind:
+amba:
+  image: cpuguy83/docker-grand-ambassador
+  volumes:
+    - "/var/run/docker.sock:/var/run/docker.sock"
+  command: "-name designatecarina_mdns_1"
+
+bind-1:
   build: .
   ports:
     - "53"
     - "953"
     - "53/udp"
     - "953/udp"
+    - "5358/tcp"
+    - "5358/udp"
+  links:
+    - "amba:mdns"
 
-  command: named -g
+  command: run-bind-with-agent.sh
 
-dbdata:
+bind-2:
   build: .
-  volumes:
-    - /var/lib/mysql
-  command: /bin/true
+  ports:
+    - "53"
+    - "953"
+    - "53/udp"
+    - "953/udp"
+    - "5358/tcp"
+    - "5358/udp"
+  links:
+    - "amba:mdns"
+
+  command: run-bind-with-agent.sh
 
 mysql:
   build: .
-
-  volumes_from:
-    - dbdata
 
   ports:
     - "3306"
@@ -39,11 +54,6 @@ memcached:
   image: memcached
   ports:
     - "11211:11211"
-
-zookeeper:
-  image: mesoscloud/zookeeper:3.4.6-ubuntu-14.04
-  ports:
-    - "2181:2181"
 
 api:
   build: .
@@ -68,15 +78,20 @@ mdns:
   links:
     - rabbit
     - mysql
+    - bind-1
+    - bind-2
   ports:
     - "5354"
 
-  command: designate-central
+  command: designate-mdns
 
 
 poolmanager:
   build: .
   links:
+    - mdns
+    - bind-1
+    - bind-2
     - rabbit
     - memcached
     - mysql
