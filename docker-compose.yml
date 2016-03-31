@@ -1,108 +1,80 @@
-amba:
-  image: cpuguy83/docker-grand-ambassador
-  volumes:
-    - "/var/run/docker.sock:/var/run/docker.sock"
-  command: "-name designatecarina_mdns_1"
+version: '2'
 
-bind-1:
-  build: .
-  ports:
-    - "53"
-    - "953"
-    - "53/udp"
-    - "953/udp"
-    - "5358/tcp"
-    - "5358/udp"
-  links:
-    - "amba:mdns"
+services:
+  base:
+    build:
+      context: .
+      args:
+        DESIGNATE_CONF: etc/designate/designate.conf
 
-  command: run-bind-with-agent.sh
+  bind-1:
+    image: designatecarina_base
+    ports:
+      - "53"
+      - "953"
+      - "53/udp"
+      - "953/udp"
+      - "5358/tcp"
+      - "5358/udp"
 
-bind-2:
-  build: .
-  ports:
-    - "53"
-    - "953"
-    - "53/udp"
-    - "953/udp"
-    - "5358/tcp"
-    - "5358/udp"
-  links:
-    - "amba:mdns"
+    command: run-bind-with-agent.sh
 
-  command: run-bind-with-agent.sh
+  bind-2:
+    image: designatecarina_base
+    ports:
+      - "53"
+      - "953"
+      - "53/udp"
+      - "953/udp"
+      - "5358/tcp"
+      - "5358/udp"
 
-mysql:
-  build: .
+    command: run-bind-with-agent.sh
 
-  ports:
-    - "3306"
+  mysql:
+    image: designatecarina_base
 
-  command: /usr/bin/mysqld_safe
+    ports:
+      - "3306"
 
-rabbit:
-  image: rabbitmq
+    command: /usr/bin/mysqld_safe
 
-  environment:
-    RABBITMQ_DEFAULT_USER: designate
-    RABBITMQ_DEFAULT_PASS: designate
+  rabbit:
+    image: rabbitmq
 
-  ports:
-    - "5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: designate
+      RABBITMQ_DEFAULT_PASS: designate
 
-memcached:
-  image: memcached
-  ports:
-    - "11211:11211"
+    ports:
+      - "5672"
 
-api:
-  build: .
-  links:
-    - rabbit
+  memcached:
+    image: memcached
+    ports:
+      - "11211:11211"
 
-  ports:
-    - "9001"
+  api:
+    image: designatecarina_base
+    ports:
+      - "9001"
+    command: designate-api
 
-  command: designate-api
+  central:
+    image: designatecarina_base
+    command: designate-central
 
-central:
-  build: .
-  links:
-    - rabbit
-    - mysql
-
-  command: designate-central
-
-mdns:
-  build: .
-  links:
-    - rabbit
-    - mysql
-    - bind-1
-    - bind-2
-  ports:
-    - "5354"
-
-  command: designate-mdns
+  mdns:
+    image: designatecarina_base
+    ports:
+      - "5354"
+    command: designate-mdns
 
 
-poolmanager:
-  build: .
-  links:
-    - mdns
-    - bind-1
-    - bind-2
-    - rabbit
-    - memcached
-    - mysql
+  poolmanager:
+    image: designatecarina_base
+    command: designate-pool-manager
 
-  command: designate-pool-manager
-
-zonemanager:
-  build: .
-  links:
-    - rabbit
-    - memcached
-    - mysql
-
-  command: designate-zone-manager
+  zonemanager:
+    image: designatecarina_base
+    command: designate-zone-manager

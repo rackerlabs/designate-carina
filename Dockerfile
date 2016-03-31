@@ -28,7 +28,7 @@ RUN git clone https://github.com/openstack/designate.git code
 
 # Select version of the code
 WORKDIR /code
-RUN git reset --hard 6aa43088033393878be0533ab246e86c45e17915
+RUN git reset --hard ${DESIGNATE_VERSION:-6aa43088033393878be0533ab246e86c45e17915}
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
@@ -56,6 +56,10 @@ COPY mysql/setup_databases.sql setup_databases.sql
 
 # Copy over our designate config
 COPY etc/designate /etc/designate
+
+# Allow us to specify a custom designate.conf at container build time
+ARG DESIGNATE_CONF
+COPY ${DESIGNATE_CONF:-etc/designate/designate.conf} /etc/designate/designate.conf
 
 # add a separate designate.conf with localhost for the db connection so we can
 # use designate-manage to sync the db even if `mysql` is not in /etc/hosts
