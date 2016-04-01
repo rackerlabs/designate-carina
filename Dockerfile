@@ -28,6 +28,7 @@ RUN git clone https://github.com/openstack/designate.git code
 
 # Select version of the code
 WORKDIR /code
+ARG DESIGNATE_VERSION
 RUN git reset --hard ${DESIGNATE_VERSION:-6aa43088033393878be0533ab246e86c45e17915}
 RUN pip install -r requirements.txt
 RUN pip install -e .
