@@ -48,7 +48,7 @@ COPY etc/designate /etc/designate
 
 # Allow us to specify a custom designate.conf at container build time
 ARG DESIGNATE_CONF
-COPY ${DESIGNATE_CONF:-etc/designate/designate.conf} /etc/designate/designate.conf
+COPY ${DESIGNATE_CONF} /etc/designate/designate.conf
 
 # add a separate designate.conf with localhost for the db connection so we can
 # use designate-manage to sync the db even if `mysql` is not in /etc/hosts
