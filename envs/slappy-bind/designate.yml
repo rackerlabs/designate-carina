@@ -1,0 +1,50 @@
+version: '2'
+
+services:
+  designate-base:
+    build:
+      args:
+        DESIGNATE_CONF: envs/slappy-bind/designate.conf
+
+  mysql:
+    image: designate-base
+    ports:
+      - "3306"
+    command: /usr/bin/mysqld_safe
+
+  rabbit:
+    image: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: designate
+      RABBITMQ_DEFAULT_PASS: designate
+    ports:
+      - "5672"
+
+  memcached:
+    image: memcached
+    ports:
+      - "11211:11211"
+
+  api:
+    image: designate-base
+    ports:
+      - "9001"
+    command: designate-api
+
+  central:
+    image: designate-base
+    command: designate-central
+
+  mdns:
+    image: designate-base
+    ports:
+      - "5354"
+    command: designate-mdns
+
+  poolmanager:
+    image: designate-base
+    command: designate-pool-manager
+
+  zonemanager:
+    image: designate-base
+    command: designate-zone-manager

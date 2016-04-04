@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y \
     git \
     mysql-server \
     rabbitmq-server \
-    wget \
-    bind9
+    wget
 
 RUN apt-get build-dep -y python-lxml
 
@@ -39,17 +38,6 @@ WORKDIR /
 RUN /etc/init.d/rabbitmq-server start && \
     rabbitmqctl add_user designate designate && \
     rabbitmqctl set_permissions -p "/" designate ".*" ".*" ".*"
-
-# Get our bind sorted
-COPY bind/named.conf.options /etc/bind/named.conf.options
-RUN touch /etc/apparmor.d/disable/usr.sbin.named
-RUN chown -R bind:bind /var/cache/bind /etc/bind
-
-# Get slappy sorted
-RUN mkdir -p /etc/slappy
-COPY bind/slappy /usr/bin/slappy
-COPY bind/run-bind-with-agent.sh /usr/bin/run-bind-with-agent.sh
-COPY bind/slappy.conf /etc/slappy/slappy.conf
 
 # Get mysql setup
 COPY mysql/bind_host.cnf /etc/mysql/conf.d/bind_host.cnf
