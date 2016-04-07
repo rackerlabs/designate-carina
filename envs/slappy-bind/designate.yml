@@ -20,11 +20,6 @@ services:
     ports:
       - "5672"
 
-  memcached:
-    image: memcached
-    ports:
-      - "11211:11211"
-
   api:
     image: designate-base
     ports:
