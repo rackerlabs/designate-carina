@@ -5,8 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.designate
-      args:
-        DESIGNATE_CONF: etc/designate/designate.conf
     image: designate-base
 
   bind-base:
