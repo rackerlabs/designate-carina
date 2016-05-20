@@ -1,0 +1,32 @@
+- name: default
+  also_notifies: []
+  attributes: {}
+  description: The default pool
+  id: 794ccc2c-d751-44fe-b57f-8894c9f5c842
+
+  nameservers:
+    - host: bind-1
+      port: 53
+    - host: bind-2
+      port: 53
+
+  targets:
+    - type: agent
+      options:
+        host: bind-1
+        port: 5358
+      masters:
+        - host: mdns
+          port: 5354
+
+    - type: agent
+      options:
+        host: bind-2
+        port: 5358
+      masters:
+        - host: mdns
+          port: 5354
+
+  ns_records:
+    - hostname: ns1.example.com.
+      priority: 1
