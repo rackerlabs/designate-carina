@@ -1,0 +1,14 @@
+FROM ubuntu:14.04
+
+RUN apt-get update && apt-get install -y bind9
+
+# Get our bind sorted
+COPY bind/named.conf.options /etc/bind/named.conf.options
+RUN touch /etc/apparmor.d/disable/usr.sbin.named
+RUN chown -R bind:bind /var/cache/bind /etc/bind
+
+# Get slappy sorted
+RUN mkdir -p /etc/slappy
+COPY bind/slappy /usr/bin/slappy
+COPY bind/run-bind-with-agent.sh /usr/bin/run-bind-with-agent.sh
+COPY bind/slappy.conf /etc/slappy/slappy.conf

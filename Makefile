@@ -5,7 +5,7 @@ CARINA_CREDS_YML := .creds.yml
 CARINA_CLUSTER_NAME := designate
 # use WITH_CLUSTER := true, to run containers locally rather than on carina
 WITH_CLUSTER := eval `$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina env $(CARINA_CLUSTER_NAME)`
-CONTAINER_NAME := designate
+COMPOSE_FILES := -f base.yml -f envs/slappy-bind/designate.yml -f envs/slappy-bind/bind.yml
 
 help:
 	@echo "help               - show help"
@@ -21,7 +21,7 @@ help:
 	@echo "rm                 - remove stopped containers"
 	@echo "ps                 - list the containers"
 	@echo "logs               - display logs from all containers"
-	@echo "ports              - list url:port for the api and bind"
+	@echo "ports              - list url:port for the api"
 
 bootstrap:
 	brew install carina
@@ -41,22 +41,22 @@ docker-info:
 	$(WITH_CLUSTER) && docker info
 
 build-containers:
-	$(WITH_CLUSTER) && docker-compose build
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) build
 
 start-foreground:
-	$(WITH_CLUSTER) && docker-compose up
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) up
 
 start:
-	$(WITH_CLUSTER) && docker-compose up -d
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) up -d
 
 logs:
-	$(WITH_CLUSTER) && docker-compose logs
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) logs
 
 stop:
-	$(WITH_CLUSTER) && docker-compose down
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) down
 
 rm:
-	$(WITH_CLUSTER) && docker-compose rm
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) rm
 
 all: cluster-creds build-containers start
 	@echo 'Everything should be running! Take a look at this Makefile to see '
@@ -64,11 +64,7 @@ all: cluster-creds build-containers start
 	@echo 'and swarm together.'
 
 ps:
-	$(WITH_CLUSTER) && docker-compose ps
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) ps
 
 ports:
 	@$(WITH_CLUSTER) && echo "API='`docker-compose port api 9001`'"
-	@$(WITH_CLUSTER) && echo "BIND1_UDP='`docker-compose port --protocol=udp bind-1 53`'"
-	@$(WITH_CLUSTER) && echo "BIND1_TCP='`docker-compose port --protocol=tcp bind-1 53`'"
-	@$(WITH_CLUSTER) && echo "BIND2_UDP='`docker-compose port --protocol=udp bind-2 53`'"
-	@$(WITH_CLUSTER) && echo "BIND2_TCP='`docker-compose port --protocol=tcp bind-2 53`'"

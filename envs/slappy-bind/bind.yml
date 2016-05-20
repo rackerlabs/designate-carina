@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  bind-1:
+    image: bind-base
+    ports:
+      - "53"
+      - "953"
+      - "53/udp"
+      - "953/udp"
+      - "5358/tcp"
+      - "5358/udp"
+
+    command: run-bind-with-agent.sh
+
+  bind-2:
+    image: bind-base
+    ports:
+      - "53"
+      - "953"
+      - "53/udp"
+      - "953/udp"
+      - "5358/tcp"
+      - "5358/udp"
+
+    command: run-bind-with-agent.sh

@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  designate-base:
+    build:
+      context: .
+      dockerfile: Dockerfile.designate
+    image: designate-base
+
+  bind-base:
+    build:
+      context: .
+      dockerfile: Dockerfile.bind
+    image: bind-base

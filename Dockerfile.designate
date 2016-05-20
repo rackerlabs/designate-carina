@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y \
     git \
     mysql-server \
     rabbitmq-server \
-    wget \
-    bind9
+    wget
 
 RUN apt-get build-dep -y python-lxml
 
@@ -40,17 +39,6 @@ RUN /etc/init.d/rabbitmq-server start && \
     rabbitmqctl add_user designate designate && \
     rabbitmqctl set_permissions -p "/" designate ".*" ".*" ".*"
 
-# Get our bind sorted
-COPY bind/named.conf.options /etc/bind/named.conf.options
-RUN touch /etc/apparmor.d/disable/usr.sbin.named
-RUN chown -R bind:bind /var/cache/bind /etc/bind
-
-# Get slappy sorted
-RUN mkdir -p /etc/slappy
-COPY bind/slappy /usr/bin/slappy
-COPY bind/run-bind-with-agent.sh /usr/bin/run-bind-with-agent.sh
-COPY bind/slappy.conf /etc/slappy/slappy.conf
-
 # Get mysql setup
 COPY mysql/bind_host.cnf /etc/mysql/conf.d/bind_host.cnf
 COPY mysql/setup_databases.sql setup_databases.sql
@@ -60,7 +48,7 @@ COPY etc/designate /etc/designate
 
 # Allow us to specify a custom designate.conf at container build time
 ARG DESIGNATE_CONF
-COPY ${DESIGNATE_CONF:-etc/designate/designate.conf} /etc/designate/designate.conf
+COPY ${DESIGNATE_CONF} /etc/designate/designate.conf
 
 # add a separate designate.conf with localhost for the db connection so we can
 # use designate-manage to sync the db even if `mysql` is not in /etc/hosts
