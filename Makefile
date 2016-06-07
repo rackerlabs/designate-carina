@@ -5,6 +5,7 @@ CARINA_CREDS_YML := .creds.yml
 CARINA_CLUSTER_NAME := designate
 # use WITH_CLUSTER := true, to run containers locally rather than on carina
 WITH_CLUSTER := eval `$(VENV)/bin/we -e $(CARINA_CREDS_YML) carina env $(CARINA_CLUSTER_NAME)`
+# WITH_CLUSTER := true
 COMPOSE_FILES := -f base.yml -f envs/slappy-bind/designate.yml -f envs/slappy-bind/bind.yml
 
 help:
@@ -15,12 +16,14 @@ help:
 	@echo "cluster-creds      - download the cluster credentials ($(CARINA_CLUSTER_NAME))"
 	@echo "docker-info        - show node info about your cluster"
 	@echo "build-containers   - build the designate containers"
+	@echo "rebuild-containers - force a rebuild of the containers (--no-cache)"
+	@echo "                     (needed when the designate version is changed)"
 	@echo "start              - start all of the designate containers"
 	@echo "start-foreground   - same as start, but in the foreground"
 	@echo "stop               - stop all of the designate containers"
 	@echo "rm                 - remove stopped containers"
 	@echo "ps                 - list the containers"
-	@echo "logs               - display logs from all containers"
+	@echo "logs               - follow logs from all containers"
 	@echo "ports              - list url:port for the api"
 
 bootstrap:
@@ -43,6 +46,9 @@ docker-info:
 build-containers:
 	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) build
 
+rebuild-containers:
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) build --no-cache
+
 start-foreground:
 	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) up
 
@@ -50,7 +56,7 @@ start:
 	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) up -d
 
 logs:
-	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) logs
+	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) logs -f
 
 stop:
 	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) down
@@ -67,4 +73,4 @@ ps:
 	$(WITH_CLUSTER) && docker-compose $(COMPOSE_FILES) ps
 
 ports:
-	@$(WITH_CLUSTER) && echo "API='`docker-compose port api 9001`'"
+	@$(WITH_CLUSTER) && echo "API=`docker-compose $(COMPOSE_FILES) port api 9001`"

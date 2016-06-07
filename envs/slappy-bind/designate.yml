@@ -5,6 +5,7 @@ services:
     build:
       args:
         DESIGNATE_CONF: envs/slappy-bind/designate.conf
+        POOLS_YAML: envs/slappy-bind/pools.yml
 
   mysql:
     image: designate-base

@@ -28,7 +28,7 @@ RUN git clone https://github.com/openstack/designate.git code
 # Select version of the code
 WORKDIR /code
 ARG DESIGNATE_VERSION
-RUN git reset --hard ${DESIGNATE_VERSION:-6aa43088033393878be0533ab246e86c45e17915}
+RUN git reset --hard ${DESIGNATE_VERSION:-3000dde21b7f7c3dc43cda3a8fa7c741a607a54b}
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
@@ -45,16 +45,23 @@ COPY mysql/setup_databases.sql setup_databases.sql
 
 # Copy over our designate config
 COPY etc/designate /etc/designate
+COPY create-pools.sh /create-pools.sh
 
 # Allow us to specify a custom designate.conf at container build time
 ARG DESIGNATE_CONF
+ARG POOLS_YAML
 COPY ${DESIGNATE_CONF} /etc/designate/designate.conf
+COPY ${POOLS_YAML} /etc/designate/pools.yml
 
 # add a separate designate.conf with localhost for the db connection so we can
 # use designate-manage to sync the db even if `mysql` is not in /etc/hosts
-RUN sed "s/@mysql/@127.0.0.1/g" /etc/designate/designate.conf > /etc/designate/local-mysql.conf
+RUN cp /etc/designate/designate.conf /etc/designate/local-mysql.conf
+RUN sed -i "s/@mysql/@127.0.0.1/g" /etc/designate/local-mysql.conf
+RUN sed -i "s/rabbit_hosts.*/rabbit_hosts = 127.0.0.1:5672/g" /etc/designate/local-mysql.conf
 
 # NOTE: A new password can be included in the setup_databases.sql
 RUN /etc/init.d/mysql start && \
     mysql -u root --password=password < setup_databases.sql && \
     designate-manage --config-file /etc/designate/local-mysql.conf database sync
+
+RUN /create-pools.sh
