@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-COPY etc/apt/* /etc/apt/sources.list
+COPY etc/apt/* /etc/apt/
 RUN apt-get update && apt-get install -y bind9
 
 # Get our bind sorted
