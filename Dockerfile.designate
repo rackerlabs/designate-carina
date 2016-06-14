@@ -1,5 +1,6 @@
 FROM ubuntu:14.04
 
+COPY etc/apt/* /etc/apt/sources.list
 COPY mysql/debconf_selections debconf_selections
 
 RUN debconf-set-selections -v debconf_selections
