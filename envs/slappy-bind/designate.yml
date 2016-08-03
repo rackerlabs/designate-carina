@@ -4,6 +4,8 @@ services:
   designate-base:
     build:
       args:
+        DESIGNATE_GIT_URL: https://git.openstack.org/openstack/designate
+        DESIGNATE_VERSION: refs/changes/84/283784/29
         DESIGNATE_CONF: envs/slappy-bind/designate.conf
         POOLS_YAML: envs/slappy-bind/pools.yml
 
@@ -37,10 +39,10 @@ services:
       - "5354"
     command: designate-mdns
 
-  poolmanager:
+  producer:
     image: designate-base
-    command: designate-pool-manager
+    command: designate-producer
 
-  zonemanager:
+  worker:
     image: designate-base
-    command: designate-zone-manager
+    command: designate-worker
